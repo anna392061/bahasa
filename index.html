@@ -73,6 +73,26 @@ const W = [0.40255,1.18385,3.173,15.69105,7.1949,0.5345,1.4604,0.0046,1.54575,0.
 const MAX_ATTEMPTS=12, MAX_MISSES=7;
 const ids = new Set(WORDS.map(x=>x.id));
 const wordMap = Object.fromEntries(WORDS.map(x => [x.id,x]));
+// Verified-only word families: no automatic prefix removal or spelling-based guesses.
+const familyGroups = new Map(), familyRootById = new Map();
+for (const item of WORDS) {
+ const root = item.wordStructure?.root;
+ if (!root) continue;
+ if (!familyGroups.has(root)) familyGroups.set(root, []);
+ familyGroups.get(root).push(item);
+ familyRootById.set(item.id, root);
+}
+for (const [root, members] of familyGroups) {
+ const base = WORDS.find(item => item.word === root);
+ if (base && !members.some(item => item.id === base.id)) {
+  members.unshift(base);
+  familyRootById.set(base.id, root);
+ }
+}
+function relatedWords(word) {
+ const root = familyRootById.get(word.id);
+ return root ? (familyGroups.get(root) || []).filter(item => item.id !== word.id) : [];
+}
 const root = document.getElementById('app');
 const nowDate = () => new Date();
 function dateKey(date=nowDate()){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;}
