@@ -370,7 +370,8 @@ function learningExtras(word){
  return pron+senseNote+structure+wordFamilyMarkup(word)+oralRelatedMarkup(word)+oralVariantsMarkup(word)+everydayPronunciation(word);
 }
 function isProductionCard(q,word){
- return !!(q && word && word.productionPrompt && (q.mode==='review'||q.success>=1));
+ // Active-recall production prompts are temporarily disabled; preserve word data for later.
+ return false;
 }
 function answerCard(word){const producing=isProductionCard(focused(),word);return `<div class="answer" id="answer-card">
  <div class="block-head"><h3>${h(word.word)}</h3><button class="audio-inline" data-speak="word" aria-label="朗读当前主学单词">🔊 发音</button></div>
@@ -393,7 +394,7 @@ function home(){const d=data.daily, completed=completedDaily(), total=totalDaily
  const progress=total?Math.round(completed/total*100):0;
  const plan=d.started?{count:d.planCount,reason:d.planReason}:recommendPlan();const goal=Math.min(plan.count,newAvailable().length+d.newIds.length);
  shell(`<main class="page"><div class="eyebrow">YOUR DAILY SPACE</div><h1>一点一点，记住新的语言。</h1><p class="lead">每天学习印尼语新词，适时复习旧词；用双语例句、固定搭配、词根词缀与日常口语，逐渐建立表达能力。</p>
- <section class="hero"><div class="shape"></div><div class="eyebrow">正在学习 · 词书</div><div class="subject">印尼语基础词汇</div><div class="minor">已接触 ${learntCount()} / ${WORDS.length} 词</div><div class="progress-track"><div class="progress-fill" style="width:${Math.round(learntCount()/WORDS.length*100)}%"></div></div><div class="minor">核心词义 · 固定搭配 · 构词与口语 · 口语主动提取</div></section>
+ <section class="hero"><div class="shape"></div><div class="eyebrow">正在学习 · 词书</div><div class="subject">印尼语基础词汇</div><div class="minor">已接触 ${learntCount()} / ${WORDS.length} 词</div><div class="progress-track"><div class="progress-fill" style="width:${Math.round(learntCount()/WORDS.length*100)}%"></div></div><div class="minor">核心词义 · 固定搭配 · 构词与日常口语</div></section>
  <div class="stats"><div class="metric"><div class="cap">今日新词</div><div class="num">${newDone}/${d.started?d.newIds.length:goal}</div></div><div class="metric"><div class="cap">今日复习</div><div class="num">${currentDayDoneCount('review')}/${d.started?d.dueIds.length:dueCount()}</div></div><div class="metric"><div class="cap">学习时间</div><div class="num">${Math.floor(d.seconds/60)}<small style="font-size:11px">min</small></div></div></div>
  <div class="block"><div class="block-head"><h2>今日任务</h2><span class="pill">${d.started ? `${progress}% 已完成` : '准备开始'}</span></div><div class="progress-track"><div class="progress-fill" style="width:${progress}%"></div></div><p class="hint">${d.started?`已完成 ${completed} / ${total} 个词的当日任务${currentDayDeferredCount()?`，其中 ${currentDayDeferredCount()} 个困难词安排明日继续`:''}。`:`今天计划引入 ${goal} 个新词，另有 ${dueCount()} 个旧词到期。`}</p>
  <div class="plan-explain"><span class="plan-chip">${data.settings.adaptive?'智能计划':'手动计划'}</span><span>${h(plan.reason)}</span></div>
