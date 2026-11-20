@@ -425,10 +425,12 @@ function study(){
  </div></main>`,'study-bg','study');
 }
 function donePage(){const d=data.daily,deferred=currentDayDeferredCount();
+ // Each miss is an actual “忘记了” response, independent of total appearances.
+ const difficult=(d.queue||[]).filter(q=>q.miss>=6&&wordMap[q.id]).sort((a,b)=>b.miss-a.miss);
  shell(`<main class="page"><div class="eyebrow">TODAY IS COMPLETE</div><div class="done-card"><div class="success">✓</div><h2>今天的学习完成了</h2><p>今天接触了 ${d.newIds.length} 个新词，复习了 ${d.dueIds.length} 个旧词。<br>${deferred?`其中 ${deferred} 个困难词将于明天继续练习。`:'今天的词都通过了当日学习。'}</p>
  <div class="stats"><div class="metric"><div class="cap">新词通过</div><div class="num">${currentDayDoneCount('new')}</div></div><div class="metric"><div class="cap">复习通过</div><div class="num">${currentDayDoneCount('review')}</div></div><div class="metric"><div class="cap">回忆次数</div><div class="num">${d.attempts}</div></div></div>
  <button class="primary" data-nav="home">返回首页</button><p class="note" style="margin:16px 0 0">认识不代表永久掌握，系统仍会在未来重新测试。</p></div>
- ${d.newIds.length?`<section class="block"><div class="block-head"><h2>用今天的单词说一句话</h2><span class="pill">可选 · 2—3词</span></div><p class="hint">先自己造句，再看看词卡例句。口头练习即可，不增加必做任务。</p>${d.newIds.slice(0,3).map(id=>{const w=wordMap[id];return `<div class="context-row"><div><b>${h(w.word)}</b><div class="sub">${h(w.zh)}</div><details><summary>参考例句</summary><p>${h(w.example)}<br><span class="tiny">${h(w.exampleZh)}</span></p></details></div><button class="audio-inline" data-audio-id="${h(w.id)}" aria-label="朗读${h(w.word)}">🔊</button></div>`}).join('')}</section>`:''}</main>`,'','study');
+ <section class="block"><div class="block-head"><h2>今天的困难单词</h2><span class="pill">忘记 ≥6 次 · ${difficult.length} 词</span></div><p class="hint">试着在今天的生活中自然使用这些词，不增加必做任务。</p>${difficult.length?difficult.map(q=>{const w=wordMap[q.id];return `<div class="context-row"><div><b>${h(w.word)}</b><div class="sub">${h(w.zh)}</div><details><summary>参考例句</summary><p>${h(w.example)}<br><span class="tiny">${h(w.exampleZh)}</span></p></details></div><button class="audio-inline" data-audio-id="${h(w.id)}" aria-label="朗读${h(w.word)}">🔊</button></div>`}).join(''):'<p class="hint">今天没有达到 6 次「忘记了」的单词。</p>'}</section></main>`,'','study');
 }
 function vocab(){
  shell(`<main class="page"><div class="eyebrow">VOCABULARY</div><h1>基础词书</h1><p class="lead">共 ${WORDS.length} 条词汇与短语。点击词条可查看主学义、固定搭配、构词规律、口语对照与双例句。</p>
